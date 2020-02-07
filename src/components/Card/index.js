@@ -19,13 +19,11 @@ export default function Card({ data, index, listIndex }) {
   const [, dropRef] = useDrop({
     accept: 'CARD',
     hover(item, monitor) {
-      const draggedListIndex = item.listIndex;
-      const targetListIndex = listIndex;
 
-      const draggedIndex = item.index;
-      const targetIndex = index;
+      const dragged = { list: item.listIndex, index: item.index };
+      const target = { list: listIndex, index };
 
-      if (draggedIndex === targetIndex && targetListIndex === draggedListIndex) {
+      if (JSON.stringify(dragged) === JSON.stringify(target)) {
         return;
       }
 
@@ -35,17 +33,18 @@ export default function Card({ data, index, listIndex }) {
       const draggedOffset = monitor.getClientOffset();
       const draggedTop = draggedOffset.y - targetSize.top;
 
-      if (draggedIndex < targetIndex && draggedTop < targetCenter) {
+      if (dragged.index < target.index && draggedTop < targetCenter) {
         return;
       }
 
-      if (draggedIndex > targetIndex && draggedTop > targetCenter) {
+      if (dragged.index > target.index && draggedTop > targetCenter) {
         return;
       }
-      move(draggedListIndex, targetListIndex, draggedIndex, targetIndex);
 
-      item.index = targetIndex;
-      item.listIndex = targetListIndex;
+      move(dragged, target);
+
+      item.index = target.index;
+      item.listIndex = target.list;
     }
   });
 
